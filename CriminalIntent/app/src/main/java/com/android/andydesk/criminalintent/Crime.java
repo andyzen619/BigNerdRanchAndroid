@@ -1,5 +1,6 @@
 package com.android.andydesk.criminalintent;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,26 +16,24 @@ public class Crime {
     private boolean mSolved;
     private boolean mRequiresPolice;
 
+    public Crime() {
+        mId = UUID.randomUUID();
+        mDate = new Date();
+    }
+
     public String getmTitle() {
         return mTitle;
     }
 
-    public Date getmDate() {
+    public String getDate() {
 
-        for(int i = 0; i < 10; i ++) {
-
-        }
-        return mDate;
+        return DateFormat.getDateInstance().format(mDate) ;
     }
 
     public boolean ismSolved() {
         return mSolved;
     }
 
-    public Crime() {
-        mId = UUID.randomUUID();
-        mDate = new Date();
-    }
 
     public void setmTitle(String mTitle) {
         this.mTitle = mTitle;

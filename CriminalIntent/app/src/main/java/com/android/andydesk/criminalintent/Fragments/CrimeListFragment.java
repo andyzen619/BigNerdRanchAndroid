@@ -1,5 +1,6 @@
 package com.android.andydesk.criminalintent.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,12 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.andydesk.criminalintent.Crime;
+import com.android.andydesk.criminalintent.CrimeActivity;
 import com.android.andydesk.criminalintent.CrimeLab;
 import com.android.andydesk.criminalintent.R;
+
 import java.util.List;
 
 /**
@@ -21,9 +24,12 @@ import java.util.List;
  */
 
 public class CrimeListFragment extends Fragment {
+    public static final String UPDATED_CRIME_POSITION_EXTRA = "crime_position";
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
     private List<Crime> mCrimes;
+    public static final int UPDATED_CRIME_RESULT = 0;
+    private int mUpdatedCrime_position;
 
     @Nullable
     @Override
@@ -39,12 +45,28 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the list of crimes to reflect the data stored.
+     */
     private void updateUI() {
         CrimeLab crimeLab  = CrimeLab.get(getContext());
-        mCrimes = crimeLab.getCrimesList();
-        mCrimeAdapter = new CrimeAdapter(mCrimes);
+        List<Crime> mCrimes = crimeLab.getCrimesList();
+
+        if (mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(mCrimes);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        }
+        else {
+            if(mUpdatedCrime_position != -1) {
+                mCrimeAdapter.notifyItemChanged(mUpdatedCrime_position);
+            }
+            else {
+                System.out.println("Nothing was changed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+        }
 
         mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        mUpdatedCrime_position = -1;
     }
 
     /**
@@ -55,6 +77,7 @@ public class CrimeListFragment extends Fragment {
         TextView mCrimeTitle;
         TextView mCrimeDate;
         Crime currentCrime;
+        ImageView mCrimeSolvedImage;
 
         public CrimeHolder(LayoutInflater inflater,
                            ViewGroup parent) {
@@ -62,6 +85,7 @@ public class CrimeListFragment extends Fragment {
 
             mCrimeTitle = (TextView) itemView.findViewById(R.id.crime_title);
             mCrimeDate = (TextView) itemView.findViewById(R.id.crime_date);
+            mCrimeSolvedImage = (ImageView) itemView.findViewById(R.id.crime_solved);
 
             itemView.setOnClickListener(this);
         }
@@ -69,15 +93,18 @@ public class CrimeListFragment extends Fragment {
         public void bind(Crime crime) {
             currentCrime = crime;
             mCrimeTitle.setText(crime.getmTitle());
-            mCrimeDate.setText(crime.getmDate().toString());
+            mCrimeDate.setText(crime.getDate());
+            mCrimeSolvedImage.setVisibility(crime.ismSolved() ? View.VISIBLE : View.GONE);
         }
 
         @Override
         public void onClick(View v) {
-            Toast toast = Toast.makeText(getActivity(), (currentCrime.getmTitle() + "has been clicked!"), Toast.LENGTH_SHORT);
-            toast.show();
+            Intent intent = CrimeActivity.newIntent(getActivity(), currentCrime.getId());
+            startActivity(intent);
+            mUpdatedCrime_position = this.getAdapterPosition();
         }
     }
+
 
     /**
      * Adapter to hold the list of crime.
@@ -112,5 +139,17 @@ public class CrimeListFragment extends Fragment {
         public int getItemViewType(int position) {
             return super.getItemViewType(position);
         }
+
+
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
+
+
+
 }
