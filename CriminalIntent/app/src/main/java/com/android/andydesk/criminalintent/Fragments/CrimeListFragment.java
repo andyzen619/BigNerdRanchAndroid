@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.andydesk.criminalintent.Crime;
-import com.android.andydesk.criminalintent.CrimeActivity;
 import com.android.andydesk.criminalintent.CrimeLab;
+import com.android.andydesk.criminalintent.CrimePagerActivity;
 import com.android.andydesk.criminalintent.R;
 
 import java.util.List;
@@ -99,7 +99,7 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), currentCrime.getId());
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), currentCrime.getId());
             startActivity(intent);
             mUpdatedCrime_position = this.getAdapterPosition();
         }
